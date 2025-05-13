@@ -8,11 +8,12 @@ function App() {
   const [userValue, setUserValue] = useState([]);
   const [solution, setSolution] = useState([]);
   const [resultMessage, setResultMessage] = useState(null);
+  const [difficulty, setDifficulty] = useState("easy");
 
   async function fetchSudokuSolution() {
     try {
       const response = await fetch(
-        "https://api.api-ninjas.com/v1/sudokugenerate?difficulty=easy",
+        `https://api.api-ninjas.com/v1/sudokugenerate?difficulty=${difficulty}`,
         {
           method: "GET",
           headers: {
@@ -26,11 +27,13 @@ function App() {
       if (result && result.solution) {
         setSolvedBoard(result.puzzle);
         setSolution(result.solution);
+        setResultMessage(null);
       }
     } catch (error) {
       console.error("Error:", error);
     }
   }
+
   useEffect(() => {
     if (solvedBoard.length > 0) {
       setUserValue(
@@ -86,7 +89,26 @@ function App() {
             <h1 className="text-center text-3xl sm:text-4xl font-bold mb-6">
               Sudoku
             </h1>
+            <div className="mb-4">
+              <label className="mr-2 font-semibold">Difficulty:</label>
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value)}
+                className="p-2 border border-gray-300 rounded"
+              >
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+            <button
+              onClick={fetchSudokuSolution}
+              className="px-4 py-2 bg-green-600 text-white rounded mt-2 hover:bg-green-700"
+            >
+              Generate Puzzle
+            </button>
           </div>
+
           <div className="overflow-auto ">
             {solvedBoard.length > 0 ? (
               <table className="table-fixed border border-collapse rounder">
@@ -105,7 +127,8 @@ function App() {
                           {item !== null ? (
                             item
                           ) : (
-                            <input type="number"
+                            <input
+                              type="number"
                               className="w-full h-full text-center text-lg outline-none"
                               onChange={(e) =>
                                 handleInputChange(
